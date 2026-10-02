@@ -2,6 +2,8 @@
 
 React letter-tracing component for kids. Mouse, touch and stylus input, stroke order, accuracy score, spoken letters, stroke-demo animation, and a ready-made A–Z game. Zero dependencies (React is a peer).
 
+**[Live demo](https://letter-tracing-94pgeqjco-krischalpotes-projects.vercel.app/)**
+
 ## Install
 
 ```bash
