@@ -1,6 +1,6 @@
 {
   "name": "letter-tracing-kop",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "React letter tracing component for kids: pointer/touch tracing, stroke order, accuracy score, speech.",
   "type": "module",
   "main": "dist/index.js",
@@ -26,8 +26,16 @@
     "react": ">=17"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
     "@types/react": "^18.3.0",
-    "react": "^18.3.0"
+    "react": "^18.3.0",
+    "typescript": "^5.5.0"
+  },
+  "homepage": "https://github.com/Krischal-Pote/letter-tracing-kop#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Krischal-Pote/letter-tracing-kop.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Krischal-Pote/letter-tracing-kop/issues"
   }
 }
