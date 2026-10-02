@@ -1,1 +1,4 @@
-{ "rewrites": [{ "source": "/", "destination": "/demo/index.html" }] }
+{
+  "outputDirectory": ".",
+  "rewrites": [{ "source": "/", "destination": "/demo/index.html" }]
+}
