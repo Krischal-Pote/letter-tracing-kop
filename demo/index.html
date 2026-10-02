@@ -1,0 +1,95 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>letter-tracing-kop demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap">
+<style>
+  :root{--ink:#1e1b4b;--muted:#6b7280;--card:#fff;--line:#e5e7eb;--accent:#6366f1;--ok:#22c55e}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 10% -10%,#e0e7ff,transparent),radial-gradient(900px 500px at 100% 0,#fce7f3,transparent),#f8fafc}
+  main{max-width:820px;margin:0 auto;padding:32px 16px 64px;text-align:center}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);margin:0 0 4px;letter-spacing:-.03em;font-weight:700}
+  h1 span{background:linear-gradient(90deg,#6366f1,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:0 0 24px}
+  .tabs{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:20px;box-shadow:0 1px 2px #0001}
+  .tabs button{border:0;background:none;padding:8px 20px;border-radius:999px;font-weight:600;font-size:.95rem;font-family:inherit;cursor:pointer;color:var(--muted)}
+  .tabs button.on{background:var(--accent);color:#fff}
+  .card{background:var(--card);border-radius:24px;padding:20px;box-shadow:0 10px 40px #4f46e522,0 1px 3px #0001;border:1px solid #fff}
+  .pad{display:flex;justify-content:center;background:
+      linear-gradient(#fff,#fff) padding-box;border:2px dashed #c7d2fe;border-radius:18px;padding:8px;margin:0 auto;width:fit-content;max-width:100%}
+  .pad svg{max-width:100%;height:auto;display:block}
+  .letters{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:18px}
+  .letters button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:.95rem;font-family:inherit;cursor:pointer;color:var(--ink);transition:.15s}
+  .letters button:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .letters button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .opts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:18px;font-size:.9rem;color:var(--muted)}
+  .opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+  .opts select{border:1px solid var(--line);border-radius:8px;padding:3px 6px;font:inherit}
+  .msg{min-height:44px;margin-top:16px;display:flex;justify-content:center;align-items:center}
+  .chip{background:#dcfce7;color:#166534;font-weight:600;padding:8px 16px;border-radius:999px;animation:pop .3s ease}
+  .hint{color:var(--muted);font-size:.9rem}
+  .game-top{font-weight:700;margin-bottom:8px;color:var(--accent)}
+  @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  footer{margin-top:24px;color:var(--muted);font-size:.85rem}
+  code{background:#eef2ff;padding:2px 6px;border-radius:6px}
+</style>
+<script type="importmap">{"imports":{
+ "react":"https://esm.sh/react@18",
+ "react/jsx-runtime":"https://esm.sh/react@18/jsx-runtime",
+ "react-dom/client":"https://esm.sh/react-dom@18/client"}}</script>
+<main><div id="root"></div></main>
+<script type="module">
+import { createElement as h, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { LetterTracer, LetterTracerGame, LETTERS } from "../dist/index.js";
+
+const KEYS = Object.keys(LETTERS);
+const GROUPS = [KEYS.filter(k => /[A-Z]/.test(k)), KEYS.filter(k => /[0-9]/.test(k))];
+
+function Toggle({ label, v, set }) {
+  return h("label", null, h("input", { type: "checkbox", checked: v, onChange: e => set(e.target.checked) }), label);
+}
+
+function App() {
+  const [mode, setMode] = useState("single");
+  const [letter, setLetter] = useState("A");
+  const [msg, setMsg] = useState("");
+  const [demo, setDemo] = useState(true);
+  const [hints, setHints] = useState(true);
+  const [guideStyle, setGuideStyle] = useState("both");
+  const [auto, setAuto] = useState(true);
+  const opts = { showStrokeDemo: demo, showHints: hints, guideStyle, size: Math.min(420, innerWidth - 80) };
+
+  const next = l => KEYS[(KEYS.indexOf(l) + 1) % KEYS.length];
+
+  return h("div", null,
+    h("h1", null, h("span", null, "letter-tracing-kop")),
+    h("p", { className: "sub" }, "Trace letters with your finger or mouse. Follow the dots."),
+    h("div", { className: "tabs" }, ["single", "game"].map(m =>
+      h("button", { key: m, className: m === mode ? "on" : "", onClick: () => { setMode(m); setMsg(""); } },
+        m === "single" ? "Practice" : "A–Z Game"))),
+    h("div", { className: "card" },
+      mode === "game"
+        ? h(LetterTracerGame, { ...opts, speakTexts: { A: "A for Apple", B: "B for Ball", C: "C for Cat" },
+            onFinish: r => setMsg(`🎉 Finished ${r.length} letters! Avg accuracy ${Math.round(r.reduce((a, x) => a + x.accuracy, 0) / r.length)}%`) })
+        : h("div", null,
+            GROUPS.map((g, gi) => h("div", { className: "letters", key: gi }, g.map(l =>
+              h("button", { key: l, className: l === letter ? "on" : "", onClick: () => { setLetter(l); setMsg(""); } }, l)))),
+            h("div", { className: "pad" },
+              h(LetterTracer, { ...opts, key: letter, letter,
+                onComplete: r => {
+                  setMsg(`✓ ${letter} done · accuracy ${r.accuracy}% · ${(r.time / 1000).toFixed(1)}s`);
+                  if (auto) setTimeout(() => { setLetter(next(letter)); setMsg(""); }, 1500);
+                } }))),
+      h("div", { className: "msg" }, msg ? h("span", { className: "chip", key: msg }, msg) : h("span", { className: "hint" }, "Lift your pen early to get a hint 👆")),
+      h("div", { className: "opts" },
+        h(Toggle, { label: "Stroke demo", v: demo, set: setDemo }),
+        h(Toggle, { label: "Hints", v: hints, set: setHints }),
+        mode === "single" && h(Toggle, { label: "Auto-next", v: auto, set: setAuto }),
+        h("label", null, "Guide ", h("select", { value: guideStyle, onChange: e => setGuideStyle(e.target.value) },
+          ["both", "dots", "line"].map(o => h("option", { key: o }, o)))))),
+    h("footer", null, "npm i ", h("code", null, "letter-tracing-kop")));
+}
+createRoot(document.getElementById("root")).render(h(App));
+</script>
